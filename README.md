@@ -1,3 +1,4 @@
+## new_instance_tool.py
 # Odoo 18 Instance Deployment Tool
 
 This script automates the deployment of a new Odoo 18 instance on a Linux server. It sets up the necessary configurations, PostgreSQL database, Odoo source code, systemd service, and Nginx reverse proxy with SSL support.
