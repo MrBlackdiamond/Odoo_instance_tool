@@ -1,0 +1,53 @@
+import os
+
+# Directory to start searching
+search_directory = '/opt/odoo_echopx/addons/'
+
+# Your custom logo path (update with the actual path or URL)
+custom_logo_path = '/path/to/your/logo.png'
+
+# File to store logs (optional)
+log_file = 'replacement_log.txt'
+
+# Function to replace logo reference in a file
+def replace_logo_reference(file_path, old_logo, new_logo):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+
+        if old_logo in content:
+            content = content.replace(old_logo, new_logo)
+
+            with open(file_path, 'w', encoding='utf-8') as file:
+                file.write(content)
+
+            return True
+    except Exception as e:
+        print(f"Error processing {file_path}: {e}")
+        return False
+
+# Recursively search through directories and replace the logo reference
+def search_and_replace_logo(directory, old_logo, new_logo):
+    replaced_files = 0
+    for dirpath, dirnames, filenames in os.walk(directory):
+        for filename in filenames:
+            file_path = os.path.join(dirpath, filename)
+
+            # Check if the file is an HTML/XML/Python file (can be extended)
+            if filename.endswith(('.html', '.xml', '.js', '.py')):
+                if replace_logo_reference(file_path, old_logo, new_logo):
+                    replaced_files += 1
+                    with open(log_file, 'a') as log:
+                        log.write(f"Replaced logo in: {file_path}\n")
+
+    return replaced_files
+
+# Old and new logo names (adjust as needed)
+old_logo = 'logo.png'
+new_logo = custom_logo_path
+
+# Run the replacement
+replaced_files_count = search_and_replace_logo(search_directory, old_logo, new_logo)
+
+print(f"Total files replaced: {replaced_files_count}")
+

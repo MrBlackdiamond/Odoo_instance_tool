@@ -1,0 +1,2 @@
+Replaced logo in: /opt/odoo_mycitybazaar/addons/web/views/webclient_templates.xml
+Replaced logo in: /opt/odoo_echopx/addons/web/views/webclient_templates.xml
