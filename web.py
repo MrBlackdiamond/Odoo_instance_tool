@@ -4,6 +4,8 @@ import sys
 import psycopg2
 from psycopg2 import sql
 import pwd
+import requests
+import json
 
 def error_message(message):
     print(f"Error: {message}")
@@ -33,17 +35,16 @@ def run_command(command, shell=False):
         error_message(f"Command failed with return code {e.returncode}\n{e.stderr}")
 
 def get_user_input():
-    if len(sys.argv) != 7:
-        error_message("Usage: script.py <master_password> <instance_name> <db_user> <db_password> <odoo_port> <domain_name>")
+    if len(sys.argv) != 6:
+        error_message("Usage: script.py <instance_name> <db_user> <db_password> <odoo_port> <domain_name>")
 
-    master_password = sys.argv[1]
-    instance_name = sys.argv[2]
-    db_user = sys.argv[3]
-    db_password = sys.argv[4]
-    odoo_port = sys.argv[5]
-    domain_name = sys.argv[6]
+    instance_name = sys.argv[1]
+    db_user = sys.argv[2]
+    db_password = sys.argv[3]
+    odoo_port = sys.argv[4]
+    domain_name = sys.argv[5]
 
-    if not all([master_password,instance_name, db_user, db_password, odoo_port, domain_name]):
+    if not all([instance_name, db_user, db_password, odoo_port, domain_name]):
         error_message("All fields are required. Please try again.")
 
     try:
@@ -51,7 +52,7 @@ def get_user_input():
     except ValueError:
         error_message("Port number must be an integer.")
 
-    return master_password, instance_name, db_user, db_password, odoo_port, domain_name
+    return instance_name, db_user, db_password, odoo_port, domain_name
 
 def create_instance_directory(instance_name):
     print("Creating directory for the new Odoo instance...")
@@ -165,12 +166,12 @@ def configure_nginx(domain_name, odoo_port):
     except Exception as e:
         error_message(f"Failed to configure nginx: {str(e)}")
 
-def create_postgres_user(db_user, db_password,master_password):
+def create_postgres_user(db_user, db_password):
     db_params = {
         "host": "localhost",
         "database": "postgres",
         "user": "postgres",
-        "password": master_password
+        "password": "admin@12345"
     }
     try:
         conn = psycopg2.connect(**db_params)
@@ -200,8 +201,48 @@ def create_postgres_user(db_user, db_password,master_password):
         print(f"Database warning: {str(e)}")
         print("Continuing with existing user...")
 
+def trim_string_before_character(text, character):
+        index = text.find(character)
+        if index != -1:
+            return text[:index]
+        return text
+
+def create_dns_record(domain):
+    url = "https://developers.hostinger.com/api/dns/v1/zones/erpbangalore.org"
+    subdomain = trim_string_before_character(domain, ".")
+
+    payload = json.dumps({
+    "zone": [
+        {
+        "name": subdomain,
+        "type": "CNAME",
+        "records": [
+            {
+            "content": "erpbangalore.org"
+            }
+        ],
+        "ttl": 14400
+        }
+    ],
+    "overwrite": False
+    })
+    headers = {
+        'Authorization': 'Bearer pNGBe3K770uPEBujFdEdFgyWeZ01GaxNo51sEChUdd6a929b',
+        'Content-Type': 'application/json',
+        'Content-Length': str(len(payload)),  # Automatically calculated in Postman, but here you can add it manually
+        'Host': 'developers.hostinger.com',
+        'User-Agent': 'PostmanRuntime/7.43.3',
+        'Accept': '*/*',
+    }
+
+    # response = requests.request("PUT", url, headers=headers, data=payload)
+    response = requests.put(url, headers=headers, data=payload)
+    return True
+
+
+
 def main():
-    master_password , instance_name, db_user, db_password, odoo_port, domain_name = get_user_input()
+    instance_name, db_user, db_password, odoo_port, domain_name = get_user_input()
     try:
         create_instance_directory(instance_name)
     except Exception as e:
@@ -214,7 +255,7 @@ def main():
         pass
 
     try:
-        create_postgres_user(db_user, db_password,master_password)
+        create_postgres_user(db_user, db_password)
     except Exception as e:
         print(f"Unable to Create PostgreSQL user -> {str(e)}")
         pass
@@ -239,6 +280,11 @@ def main():
         configure_nginx(domain_name, odoo_port)
     except Exception as e :
         print(f"Unabel to create nginx file {str(e)}")
+
+    try:
+        create_dns_record(domain_name)
+    except Exception as e:
+        print("Unable to create a DNS record")
 
     print(f"\nOdoo instance '{instance_name}' has been successfully created!")
     print(f"Access your Odoo instance at: https://{domain_name}")

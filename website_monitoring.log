@@ -1,13 +1,26 @@
-2025-04-17 15:17:01,353 - INFO - Read 5 URLs from the file.
-2025-04-17 15:17:01,354 - INFO - Cron job started at: 1744883221.354183
-2025-04-17 15:17:01,354 - INFO - Starting site status check for: https://developer.erpbangalore.org
-2025-04-17 15:17:01,358 - INFO - Starting site status check for: https://www.google.com
-2025-04-17 15:17:01,361 - INFO - Starting site status check for: https://www.facebook.com
-2025-04-17 15:17:01,363 - INFO - Starting site status check for: https://echopx.erpbangalore.org/summa
-2025-04-17 15:17:01,364 - INFO - Starting site status check for: https://example.com/404
-2025-04-17 15:17:01,522 - INFO - Checked URL: https://developer.erpbangalore.org with status code: 200
-2025-04-17 15:17:01,543 - INFO - Checked URL: https://echopx.erpbangalore.org/summa with status code: 404
-2025-04-17 15:17:01,811 - INFO - Checked URL: https://www.facebook.com with status code: 200
-2025-04-17 15:17:02,306 - INFO - Checked URL: https://www.google.com with status code: 429
-2025-04-17 15:17:03,037 - INFO - Checked URL: https://example.com/404 with status code: 404
-2025-04-17 15:17:05,940 - INFO - Email sent successfully to rajurebel199@gmail.com
+2025-04-22 07:00:02,745 - INFO - Read 5 URLs from the file.
+2025-04-22 07:00:02,745 - INFO - Cron job started at: 1745285402.7452438
+2025-04-22 07:00:02,745 - INFO - Starting site status check for: https://developer.erpbangalore.org
+2025-04-22 07:00:02,746 - INFO - Starting site status check for: https://www.google.com
+2025-04-22 07:00:02,746 - INFO - Starting site status check for: https://www.facebook.com
+2025-04-22 07:00:02,748 - INFO - Starting site status check for: https://echopx.erpbangalore.org/summa
+2025-04-22 07:00:02,748 - INFO - Starting site status check for: https://example.com/404
+2025-04-22 07:00:03,291 - INFO - Checked URL: https://www.google.com with status code: 429
+2025-04-22 07:00:03,536 - INFO - Checked URL: https://www.facebook.com with status code: 200
+2025-04-22 07:00:04,070 - INFO - Checked URL: https://echopx.erpbangalore.org/summa with status code: 404
+2025-04-22 07:00:04,075 - INFO - Checked URL: https://example.com/404 with status code: 404
+2025-04-22 07:00:04,116 - INFO - Checked URL: https://developer.erpbangalore.org with status code: 200
+2025-04-22 07:00:07,475 - INFO - Email sent successfully to rajurebel199@gmail.com
+2025-04-23 07:00:01,594 - INFO - Read 5 URLs from the file.
+2025-04-23 07:00:01,594 - INFO - Cron job started at: 1745371801.5945253
+2025-04-23 07:00:01,596 - INFO - Starting site status check for: https://developer.erpbangalore.org
+2025-04-23 07:00:01,597 - INFO - Starting site status check for: https://www.google.com
+2025-04-23 07:00:01,602 - INFO - Starting site status check for: https://www.facebook.com
+2025-04-23 07:00:01,604 - INFO - Starting site status check for: https://echopx.erpbangalore.org/summa
+2025-04-23 07:00:01,605 - INFO - Starting site status check for: https://example.com/404
+2025-04-23 07:00:01,945 - INFO - Checked URL: https://www.google.com with status code: 429
+2025-04-23 07:00:02,084 - INFO - Checked URL: https://www.facebook.com with status code: 200
+2025-04-23 07:00:02,856 - INFO - Checked URL: https://example.com/404 with status code: 404
+2025-04-23 07:00:03,262 - INFO - Checked URL: https://developer.erpbangalore.org with status code: 200
+2025-04-23 07:00:03,285 - INFO - Checked URL: https://echopx.erpbangalore.org/summa with status code: 404
+2025-04-23 07:00:06,808 - INFO - Email sent successfully to rajurebel199@gmail.com
