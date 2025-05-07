@@ -122,6 +122,7 @@ def get_user_input():
     domain_name = sys.argv[5]
 
     odoo_port = assign_new_port()
+    db_name  = f"{instance_name}_db"
     instance_name = "odoo_"+instance_name 
 
     if not all([master_password,instance_name, db_user, db_password, odoo_port, domain_name]):
@@ -132,7 +133,7 @@ def get_user_input():
     except ValueError:
         error_message("Port number must be an integer.")
 
-    return master_password, instance_name, db_user, db_password, odoo_port, domain_name
+    return master_password, instance_name, db_user, db_password, odoo_port, domain_name,db_name
 
 def create_instance_directory(instance_name):
     print("Creating directory for the new Odoo instance...")
@@ -150,10 +151,11 @@ def clone_odoo_source(instance_name):
     #run_command(["sudo", "git", "clone", "https://github.com/odoo/odoo.git", "-b", "18.0", "--single-branch", f"/opt/{instance_name}"])
 
 def create_odoo_config(instance_name, db_user, db_password, odoo_port):
+    admin_password = get_data('admin_password')
     print("Creating Odoo configuration file...")
     config_content = f"""[options]
     proxy_mode = True
-    admin_passwd = admin@12345
+    admin_passwd = {admin_password}
     db_host = localhost
     db_port = 5432
     db_user = {db_user}
@@ -213,6 +215,7 @@ def create_systemd_service(instance_name):
 def configure_nginx(domain_name, odoo_port):
     print("Configuring Nginx...")
     nginx_config = f"""server {{
+    client_max_body_size 512M;
     listen 80;
     server_name {domain_name};
 
@@ -286,8 +289,50 @@ def trim_string_before_character(text, character):
             return text[:index]
         return text
 
+def add_instance_info(master_password, instance_name, db_name, db_user, db_password, domain_name, port):
+    file_path = "/var/www/instances.json"
+    db_master = get_data('master_password')
+    
+    try:
+        if master_password != db_master:
+            error_message("Error: Invalid master password")
+        
+        new_data = {
+            "instance_name": instance_name,
+            "db_name": db_name,
+            "db_user": db_user,
+            "db_password": db_password,
+            "domain": domain_name,
+            "port": port
+        }
+
+        # Initialize or load existing data
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+            try:
+                with open(file_path, "r") as file:
+                    data = json.load(file)
+                # Ensure data is always a list
+                if not isinstance(data, list):
+                    data = [data]  # Convert single dict to list
+            except json.JSONDecodeError:
+                data = []
+        else:
+            data = []
+
+        # Append new data to the list
+        data.append(new_data)
+
+        # Write back as proper JSON array
+        with open(file_path, "w") as file:
+            json.dump(data, file, indent=4)
+        print(f"Added {instance_name} to {file_path}")
+        return True
+    except Exception as e:
+        print("There was an error adding the instance info:", str(e))
+        return False
+
 def create_dns_record(domain):
-    url = "https://developers.hostinger.com/api/dns/v1/zones/erpbangalore.org"
+    url = f"https://developers.hostinger.com/api/dns/v1/zones/erpbangalore.org"
     subdomain = trim_string_before_character(domain, ".")
 
     payload = json.dumps({
@@ -320,7 +365,7 @@ def create_dns_record(domain):
 
 def main():
     load_config()
-    master_password, instance_name, db_user, db_password, odoo_port, domain_name = get_user_input()
+    master_password, instance_name, db_user, db_password, odoo_port, domain_name, db_name = get_user_input()
     db_master = get_data('master_password')
     if master_password != db_master:
         error_message("Error: Invalid master password")
@@ -366,12 +411,20 @@ def main():
     except Exception as e:
         print("Unable to create a DNS record")
 
+    add_instance_info(
+        master_password=master_password,
+        instance_name=instance_name,
+        db_name=db_name,
+        db_user=db_user,
+        db_password=db_password,
+        domain_name=domain_name,
+        port=odoo_port
+    )
+
     print(f"\nOdoo instance '{instance_name}' has been successfully created!")
     print(f"Access your Odoo instance at: https://{domain_name}")
     print(f"PostgreSQL User: {db_user}")
     print(f"Odoo Port: {odoo_port}")
-
-
-
+      
 if __name__ == "__main__":
     main()
